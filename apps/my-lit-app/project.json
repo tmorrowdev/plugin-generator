@@ -1,0 +1,61 @@
+{
+  "name": "my-lit-app",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/my-lit-app/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+        "build": {
+          "executor": "@nx/esbuild:esbuild",
+          "outputs": ["{options.outputPath}"],
+          "defaultConfiguration": "production",
+          "options": {
+            "outputPath": "dist/esm/apps/my-lit-app",
+            "format": ["esm"],
+            "bundle": true,
+            "thirdParty": true,
+            "main": "apps/my-lit-app/src/main.ts",
+            "tsConfig": "apps/my-lit-app/tsconfig.app.json",
+            "assets": ["apps/my-lit-app/src/assets", "apps/my-lit-app/index.html"],
+            "generatePackageJson": true,
+            "esbuildOptions": {
+              "sourcemap": true,
+              "outExtension": {
+                ".js": ".js"
+              }
+            }
+          }
+        },
+        "build-cjs": {
+          "executor": "@nx/esbuild:esbuild",
+          "outputs": ["{options.outputPath}"],
+          "defaultConfiguration": "production",
+          "options": {
+            "outputPath": "dist/cjs/apps/my-lit-app",
+            "format": ["cjs"],
+            "bundle": true,
+            "thirdParty": true,
+            "main": "apps/my-lit-app/src/main.ts",
+            "tsConfig": "apps/my-lit-app/tsconfig.app.json",
+            "assets": ["apps/my-lit-app/src/assets", "apps/my-lit-app/index.html"],
+            "generatePackageJson": true,
+            "esbuildOptions": {
+              "sourcemap": true,
+              "outExtension": {
+                ".js": ".js"
+              }
+            }
+          }
+        },
+   "serve": {
+      "dependsOn": ["build"],
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "http-server dist/apps/my-lit-app",
+          "nx watch --projects=my-lit-app --includeDependentProjects -- nx build my-lit-app"
+        ]
+      }
+    }
+  }
+}

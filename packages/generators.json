@@ -1,0 +1,9 @@
+{
+  "generators": {
+    "yarn-plugin-generator": {
+      "factory": "./src/generators/yarn-plugin-generator/generator",
+      "schema": "./src/generators/yarn-plugin-generator/schema.json",
+      "description": "yarn-plugin-generator generator"
+    }
+  }
+}

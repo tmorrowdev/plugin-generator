@@ -1,0 +1,41 @@
+{
+  "name": "yarn-plugin",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/packages",
+        "main": "packages/src/index.ts",
+        "tsConfig": "packages/tsconfig.lib.json",
+        "assets": [
+          "packages/*.md",
+          {
+            "input": "./packages/src",
+            "glob": "**/!(*.ts)",
+            "output": "./src"
+          },
+          {
+            "input": "./packages/src",
+            "glob": "**/*.d.ts",
+            "output": "./src"
+          },
+          {
+            "input": "./packages",
+            "glob": "generators.json",
+            "output": "."
+          },
+          {
+            "input": "./packages",
+            "glob": "executors.json",
+            "output": "."
+          }
+        ]
+      }
+    }
+  }
+}
