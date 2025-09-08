@@ -1,0 +1,201 @@
+import type { Meta, StoryObj } from '@storybook/web-components';
+import { html } from 'lit';
+import './<%= name %>';
+
+const meta: Meta = {
+  title: 'Patterns/<%= className %>',
+  component: '<%= name %>-<%= pattern %>',
+  parameters: {
+    layout: 'centered',
+  },
+  argTypes: {
+    variant: {
+      control: { type: 'select' },
+      options: <% if (pattern === 'layout') { %>['default', 'centered', 'sidebar']<% } else if (pattern === 'navigation') { %>['primary', 'breadcrumbs', 'tabs']<% } else if (pattern === 'form') { %>['default']<% } else if (pattern === 'data-display') { %>['table', 'list', 'chart', 'cards']<% } else if (pattern === 'feedback') { %>['alert', 'modal', 'tooltip', 'loading']<% } else if (pattern === 'interaction') { %>['dropdown', 'accordion', 'tabs', 'popover']<% } else { %>['default']<% } %>,
+    },
+  },
+};
+
+export default meta;
+type Story = StoryObj;
+
+<% if (pattern === 'layout') { %>
+export const Default: Story = {
+  args: {
+    variant: 'default',
+    withContainer: true,
+  },
+  render: (args) => html`
+    <<%= name %>-layout variant="${args.variant}" ?with-container="${args.withContainer}">
+      <div slot="header">Header Content</div>
+      <div slot="main">Main Content Area</div>
+      <div slot="footer">Footer Content</div>
+    </<%= name %>-layout>
+  `,
+};
+
+export const Sidebar: Story = {
+  args: {
+    variant: 'sidebar',
+    withContainer: true,
+  },
+  render: (args) => html`
+    <<%= name %>-layout variant="${args.variant}" ?with-container="${args.withContainer}">
+      <div slot="sidebar">Sidebar Navigation</div>
+      <div slot="header">Header Content</div>
+      <div slot="main">Main Content Area</div>
+      <div slot="footer">Footer Content</div>
+    </<%= name %>-layout>
+  `,
+};
+<% } else if (pattern === 'navigation') { %>
+export const Primary: Story = {
+  args: {
+    variant: 'primary',
+    items: [
+      { label: 'Home', href: '/', active: true },
+      { label: 'About', href: '/about' },
+      { label: 'Services', href: '/services' },
+      { label: 'Contact', href: '/contact' },
+    ],
+  },
+};
+
+export const Breadcrumbs: Story = {
+  args: {
+    variant: 'breadcrumbs',
+    items: [
+      { label: 'Home', href: '/' },
+      { label: 'Products', href: '/products' },
+      { label: 'Category', href: '/products/category' },
+      { label: 'Item' },
+    ],
+  },
+};
+
+export const Tabs: Story = {
+  args: {
+    variant: 'tabs',
+    items: [
+      { label: 'Tab 1', active: true },
+      { label: 'Tab 2' },
+      { label: 'Tab 3' },
+    ],
+  },
+  render: (args) => html`
+    <<%= name %>-navigation .variant="${args.variant}" .items="${args.items}">
+      <div slot="panel-0">Content for Tab 1</div>
+      <div slot="panel-1">Content for Tab 2</div>
+      <div slot="panel-2">Content for Tab 3</div>
+    </<%= name %>-navigation>
+  `,
+};
+<% } else if (pattern === 'form') { %>
+export const Default: Story = {
+  args: {
+    title: '<%= className %> Form',
+    showValidation: true,
+  },
+  render: (args) => html`
+    <<%= name %>-form 
+      title="${args.title}" 
+      ?show-validation="${args.showValidation}"
+      @form-submit="${(e) => console.log('Form submitted:', e.detail)}"
+    ></<%= name %>-form>
+  `,
+};
+<% } else if (pattern === 'data-display') { %>
+export const Table: Story = {
+  args: {
+    variant: 'table',
+    columns: [
+      { key: 'name', label: 'Name' },
+      { key: 'email', label: 'Email' },
+      { key: 'role', label: 'Role' },
+    ],
+    data: [
+      { name: 'John Doe', email: 'john@example.com', role: 'Developer' },
+      { name: 'Jane Smith', email: 'jane@example.com', role: 'Designer' },
+      { name: 'Bob Johnson', email: 'bob@example.com', role: 'Manager' },
+    ],
+  },
+};
+
+export const Cards: Story = {
+  args: {
+    variant: 'cards',
+    data: [
+      { title: 'Card 1', description: 'Description for card 1', status: 'Active' },
+      { title: 'Card 2', description: 'Description for card 2', status: 'Pending' },
+      { title: 'Card 3', description: 'Description for card 3', status: 'Completed' },
+    ],
+  },
+};
+<% } else if (pattern === 'feedback') { %>
+export const Alert: Story = {
+  args: {
+    variant: 'alert',
+    type: 'info',
+    title: 'Information',
+    message: 'This is an informational alert message.',
+    dismissible: true,
+  },
+};
+
+export const Modal: Story = {
+  args: {
+    variant: 'modal',
+    title: 'Modal Title',
+    message: 'This is the modal content.',
+    open: true,
+  },
+};
+
+export const Loading: Story = {
+  args: {
+    variant: 'loading',
+    message: 'Loading data...',
+  },
+};
+<% } else if (pattern === 'interaction') { %>
+export const Dropdown: Story = {
+  args: {
+    variant: 'dropdown',
+    items: [
+      { label: 'Option 1', selected: true },
+      { label: 'Option 2' },
+      { label: 'Option 3' },
+      { label: 'Option 4 (Disabled)', disabled: true },
+    ],
+  },
+};
+
+export const Accordion: Story = {
+  args: {
+    variant: 'accordion',
+    items: [
+      { label: 'Section 1', content: 'Content for section 1' },
+      { label: 'Section 2', content: 'Content for section 2' },
+      { label: 'Section 3', content: 'Content for section 3' },
+    ],
+  },
+};
+
+export const Tabs: Story = {
+  args: {
+    variant: 'tabs',
+    items: [
+      { label: 'Tab 1', content: 'Content for tab 1' },
+      { label: 'Tab 2', content: 'Content for tab 2' },
+      { label: 'Tab 3', content: 'Content for tab 3' },
+    ],
+  },
+};
+<% } else { %>
+export const Default: Story = {
+  args: {},
+  render: (args) => html`
+    <<%= name %>-<%= pattern %> ...args></<%= name %>-<%= pattern %>>
+  `,
+};
+<% } %>

@@ -1,0 +1,198 @@
+import { html } from 'lit';
+import { fixture, expect, elementUpdated } from '@open-wc/testing';
+import './<%= name %>';
+import type { <%= className %><%= pattern.charAt(0).toUpperCase() + pattern.slice(1).replace(/-([a-z])/g, (g) => g[1].toUpperCase()) %> } from './<%= name %>';
+
+describe('<%= className %><%= pattern.charAt(0).toUpperCase() + pattern.slice(1).replace(/-([a-z])/g, (g) => g[1].toUpperCase()) %>', () => {
+  it('renders correctly', async () => {
+    const el = await fixture<%= className %><%= pattern.charAt(0).toUpperCase() + pattern.slice(1).replace(/-([a-z])/g, (g) => g[1].toUpperCase()) %>>(html`
+      <<%= name %>-<%= pattern %>></<%= name %>-<%= pattern %>>
+    `);
+
+    expect(el).to.exist;
+    expect(el.shadowRoot).to.exist;
+  });
+
+<% if (pattern === 'layout') { %>
+  it('should apply correct variant', async () => {
+    const el = await fixture<<%= className %>Layout>(html`
+      <<%= name %>-layout variant="sidebar"></<%= name %>-layout>
+    `);
+
+    expect(el.variant).to.equal('sidebar');
+    
+    const wrapper = el.shadowRoot?.querySelector('.sidebar-layout');
+    expect(wrapper).to.exist;
+  });
+
+  it('should toggle container usage', async () => {
+    const el = await fixture<<%= className %>Layout>(html`
+      <<%= name %>-layout with-container="false"></<%= name %>-layout>
+    `);
+
+    expect(el.withContainer).to.be.false;
+  });
+<% } else if (pattern === 'navigation') { %>
+  it('should render navigation items', async () => {
+    const items = [
+      { label: 'Home', href: '/', active: true },
+      { label: 'About', href: '/about' }
+    ];
+    
+    const el = await fixture<<%= className %>Navigation>(html`
+      <<%= name %>-navigation .items="${items}"></<%= name %>-navigation>
+    `);
+
+    expect(el.items).to.deep.equal(items);
+  });
+
+  it('should handle tab clicks', async () => {
+    const items = [
+      { label: 'Tab 1', active: true },
+      { label: 'Tab 2' }
+    ];
+    
+    const el = await fixture<<%= className %>Navigation>(html`
+      <<%= name %>-navigation variant="tabs" .items="${items}"></<%= name %>-navigation>
+    `);
+
+    // Simulate tab click
+    el.handleTabClick?.(1);
+    await elementUpdated(el);
+
+    expect(el.items[1].active).to.be.true;
+    expect(el.items[0].active).to.be.false;
+  });
+<% } else if (pattern === 'form') { %>
+  it('should handle form submission', async () => {
+    const el = await fixture<<%= className %>Form>(html`
+      <<%= name %>-form></<%= name %>-form>
+    `);
+
+    let submitData: any = null;
+    el.addEventListener('form-submit', (e: any) => {
+      submitData = e.detail.data;
+    });
+
+    // Simulate form data
+    el.formData = { name: 'Test User', email: 'test@example.com' };
+    
+    const form = el.shadowRoot?.querySelector('form');
+    form?.dispatchEvent(new Event('submit'));
+
+    expect(submitData).to.deep.include({ name: 'Test User', email: 'test@example.com' });
+  });
+
+  it('should validate required fields', async () => {
+    const el = await fixture<<%= className %>Form>(html`
+      <<%= name %>-form show-validation></<%= name %>-form>
+    `);
+
+    const isValid = el.validate?.();
+    expect(isValid).to.be.false;
+    expect(Object.keys(el.errors || {})).to.include.members(['name', 'email']);
+  });
+<% } else if (pattern === 'data-display') { %>
+  it('should render data correctly', async () => {
+    const data = [
+      { name: 'John', email: 'john@example.com' },
+      { name: 'Jane', email: 'jane@example.com' }
+    ];
+    const columns = [
+      { key: 'name', label: 'Name' },
+      { key: 'email', label: 'Email' }
+    ];
+
+    const el = await fixture<<%= className %>DataDisplay>(html`
+      <<%= name %>-data-display .data="${data}" .columns="${columns}"></<%= name %>-data-display>
+    `);
+
+    expect(el.data).to.deep.equal(data);
+    expect(el.columns).to.deep.equal(columns);
+  });
+
+  it('should show empty state when no data', async () => {
+    const el = await fixture<<%= className %>DataDisplay>(html`
+      <<%= name %>-data-display></<%= name %>-data-display>
+    `);
+
+    const emptyState = el.shadowRoot?.querySelector('.empty');
+    expect(emptyState).to.exist;
+  });
+<% } else if (pattern === 'feedback') { %>
+  it('should handle dismiss action', async () => {
+    const el = await fixture<<%= className %>Feedback>(html`
+      <<%= name %>-feedback variant="alert" message="Test message" dismissible></<%= name %>-feedback>
+    `);
+
+    let dismissEventFired = false;
+    el.addEventListener('feedback-dismiss', () => {
+      dismissEventFired = true;
+    });
+
+    el.handleDismiss?.();
+    expect(dismissEventFired).to.be.true;
+    expect(el.isVisible).to.be.false;
+  });
+
+  it('should show and hide correctly', async () => {
+    const el = await fixture<<%= className %>Feedback>(html`
+      <<%= name %>-feedback variant="modal"></<%= name %>-feedback>
+    `);
+
+    el.show();
+    expect(el.open).to.be.true;
+    expect(el.isVisible).to.be.true;
+
+    el.hide();
+    expect(el.open).to.be.false;
+    expect(el.isVisible).to.be.false;
+  });
+<% } else if (pattern === 'interaction') { %>
+  it('should handle tab selection', async () => {
+    const items = [
+      { label: 'Tab 1' },
+      { label: 'Tab 2' },
+      { label: 'Tab 3' }
+    ];
+
+    const el = await fixture<<%= className %>Interaction>(html`
+      <<%= name %>-interaction variant="tabs" .items="${items}"></<%= name %>-interaction>
+    `);
+
+    el.handleTabClick?.(2);
+    expect(el.activeIndex).to.equal(2);
+  });
+
+  it('should emit interaction change events', async () => {
+    const el = await fixture<<%= className %>Interaction>(html`
+      <<%= name %>-interaction variant="dropdown"></<%= name %>-interaction>
+    `);
+
+    let changeEventFired = false;
+    el.addEventListener('interaction-change', () => {
+      changeEventFired = true;
+    });
+
+    el.handleDropdownSelect?.(new CustomEvent('dropdown-select', { detail: { value: 1 } }));
+    expect(changeEventFired).to.be.true;
+  });
+
+  it('should set active index correctly', async () => {
+    const el = await fixture<<%= className %>Interaction>(html`
+      <<%= name %>-interaction></<%= name %>-interaction>
+    `);
+
+    el.setActiveIndex(3);
+    expect(el.activeIndex).to.equal(3);
+  });
+<% } %>
+
+  it('should be accessible', async () => {
+    const el = await fixture(html`
+      <<%= name %>-<%= pattern %>></<%= name %>-<%= pattern %>>
+    `);
+
+    await expect(el).to.be.accessible();
+  });
+});

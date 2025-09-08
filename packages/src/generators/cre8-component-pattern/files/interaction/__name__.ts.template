@@ -1,0 +1,185 @@
+import { html, LitElement, css } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
+import { 
+  Cre8Dropdown,
+  Cre8DropdownItem,
+  Cre8Accordion,
+  Cre8AccordionItem,
+  Cre8Tabs,
+  Cre8Tab,
+  Cre8TabPanel,
+  Cre8Popover
+} from '@cre8_dev/cre8-wc';
+
+/**
+ * <%= className %> Interaction Pattern
+ * A reusable interaction pattern using Cre8-Components
+ */
+@customElement('<%= name %>-interaction')
+export class <%= className %>Interaction extends LitElement {
+  @property({ type: String }) variant: 'dropdown' | 'accordion' | 'tabs' | 'popover' = 'dropdown';
+  @property({ type: Array }) items: Array<{
+    label: string;
+    content?: string;
+    disabled?: boolean;
+    selected?: boolean;
+  }> = [];
+  @state() private activeIndex = 0;
+
+  static styles = css`
+    :host {
+      display: block;
+    }
+    
+    .interaction-wrapper {
+      width: 100%;
+    }
+    
+    .popover-trigger {
+      display: inline-block;
+      cursor: pointer;
+    }
+  `;
+
+  render() {
+    if (this.variant === 'dropdown') {
+      return html`
+        <div class="interaction-wrapper">
+          <cre8-dropdown @dropdown-select="${this.handleDropdownSelect}">
+            ${this.items.map((item, index) => html`
+              <cre8-dropdown-item 
+                value="${index}"
+                ?disabled="${item.disabled}"
+                ?selected="${item.selected}"
+              >
+                ${item.label}
+              </cre8-dropdown-item>
+            `)}
+          </cre8-dropdown>
+        </div>
+      `;
+    }
+
+    if (this.variant === 'accordion') {
+      return html`
+        <div class="interaction-wrapper">
+          <cre8-accordion>
+            ${this.items.map((item, index) => html`
+              <cre8-accordion-item 
+                @accordion-toggle="${() => this.handleAccordionToggle(index)}"
+              >
+                <span slot="header">${item.label}</span>
+                <div slot="content">
+                  ${item.content || html`<slot name="item-${index}"></slot>`}
+                </div>
+              </cre8-accordion-item>
+            `)}
+          </cre8-accordion>
+        </div>
+      `;
+    }
+
+    if (this.variant === 'tabs') {
+      return html`
+        <div class="interaction-wrapper">
+          <cre8-tabs>
+            ${this.items.map((item, index) => html`
+              <cre8-tab 
+                slot="tab"
+                ?selected="${index === this.activeIndex}"
+                ?disabled="${item.disabled}"
+                @click="${() => this.handleTabClick(index)}"
+              >
+                ${item.label}
+              </cre8-tab>
+            `)}
+            ${this.items.map((item, index) => html`
+              <cre8-tab-panel 
+                slot="panel"
+                ?selected="${index === this.activeIndex}"
+              >
+                ${item.content || html`<slot name="panel-${index}"></slot>`}
+              </cre8-tab-panel>
+            `)}
+          </cre8-tabs>
+        </div>
+      `;
+    }
+
+    if (this.variant === 'popover') {
+      return html`
+        <div class="interaction-wrapper">
+          <cre8-popover>
+            <div slot="trigger" class="popover-trigger">
+              <slot name="trigger">
+                <button>Click me</button>
+              </slot>
+            </div>
+            <div slot="content">
+              ${this.items.length > 0 ? html`
+                <ul>
+                  ${this.items.map(item => html`
+                    <li>${item.label}</li>
+                  `)}
+                </ul>
+              ` : html`
+                <slot name="popover-content"></slot>
+              `}
+            </div>
+          </cre8-popover>
+        </div>
+      `;
+    }
+
+    return html`<div class="interaction-wrapper">No variant selected</div>`;
+  }
+
+  private handleDropdownSelect(e: CustomEvent) {
+    const selectedValue = e.detail.value;
+    this.dispatchEvent(new CustomEvent('interaction-change', {
+      detail: { 
+        variant: 'dropdown', 
+        selectedIndex: selectedValue,
+        selectedItem: this.items[selectedValue]
+      },
+      bubbles: true
+    }));
+  }
+
+  private handleTabClick(index: number) {
+    if (this.items[index]?.disabled) return;
+    
+    this.activeIndex = index;
+    this.dispatchEvent(new CustomEvent('interaction-change', {
+      detail: { 
+        variant: 'tabs', 
+        selectedIndex: index,
+        selectedItem: this.items[index]
+      },
+      bubbles: true
+    }));
+  }
+
+  private handleAccordionToggle(index: number) {
+    this.dispatchEvent(new CustomEvent('interaction-change', {
+      detail: { 
+        variant: 'accordion', 
+        toggledIndex: index,
+        toggledItem: this.items[index]
+      },
+      bubbles: true
+    }));
+  }
+
+  setActiveIndex(index: number) {
+    if (index >= 0 && index < this.items.length) {
+      this.activeIndex = index;
+    }
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    '<%= name %>-interaction': <%= className %>Interaction;
+  }
+}

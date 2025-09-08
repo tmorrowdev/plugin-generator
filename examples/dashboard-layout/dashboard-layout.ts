@@ -1,0 +1,106 @@
+import { html, LitElement, css } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
+import {
+  Cre8Layout,
+  Cre8LayoutContainer,
+  Cre8LayoutSection,
+  Cre8Grid,
+  Cre8GridItem,
+  Cre8Card,
+} from '@cre8_dev/cre8-wc';
+
+/**
+ * DashboardLayout Layout Pattern
+ * A reusable layout pattern using Cre8-Components
+ */
+@customElement('dashboard-layout-layout')
+export class DashboardLayoutLayout extends LitElement {
+  @property({ type: String }) variant: 'default' | 'centered' | 'sidebar' =
+    'default';
+  @property({ type: Boolean }) withContainer = true;
+
+  static styles = css`
+    :host {
+      display: block;
+    }
+
+    .layout-wrapper {
+      width: 100%;
+    }
+
+    .sidebar-layout {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 2rem;
+    }
+
+    .centered-layout {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+  `;
+
+  render() {
+    const layoutContent = html`
+      <cre8-grid>
+        <cre8-grid-item>
+          <slot name="header"></slot>
+        </cre8-grid-item>
+        <cre8-grid-item>
+          <slot name="main"></slot>
+        </cre8-grid-item>
+        <cre8-grid-item>
+          <slot name="footer"></slot>
+        </cre8-grid-item>
+      </cre8-grid>
+    `;
+
+    if (this.variant === 'sidebar') {
+      return html`
+        <div class="layout-wrapper sidebar-layout">
+          <aside>
+            <slot name="sidebar"></slot>
+          </aside>
+          <main>
+            ${this.withContainer
+              ? html`<cre8-layout-container
+                  >${layoutContent}</cre8-layout-container
+                >`
+              : layoutContent}
+          </main>
+        </div>
+      `;
+    }
+
+    if (this.variant === 'centered') {
+      return html`
+        <div class="layout-wrapper centered-layout">
+          ${this.withContainer
+            ? html`<cre8-layout-container
+                >${layoutContent}</cre8-layout-container
+              >`
+            : layoutContent}
+        </div>
+      `;
+    }
+
+    return html`
+      <div class="layout-wrapper">
+        <cre8-layout>
+          ${this.withContainer
+            ? html`<cre8-layout-container
+                >${layoutContent}</cre8-layout-container
+              >`
+            : layoutContent}
+        </cre8-layout>
+      </div>
+    `;
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'dashboard-layout-layout': DashboardLayoutLayout;
+  }
+}

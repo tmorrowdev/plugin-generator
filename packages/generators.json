@@ -4,6 +4,11 @@
       "factory": "./src/generators/yarn-plugin-generator/generator",
       "schema": "./src/generators/yarn-plugin-generator/schema.json",
       "description": "yarn-plugin-generator generator"
+    },
+    "cre8-component-pattern": {
+      "factory": "./src/generators/cre8-component-pattern/generator",
+      "schema": "./src/generators/cre8-component-pattern/schema.json",
+      "description": "Generate reusable UI patterns using Cre8-Components"
     }
   }
 }

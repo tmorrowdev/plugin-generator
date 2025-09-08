@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-
+import {DashboardLayoutLayout} from '../../../examples';
 @customElement('my-element')
 export class MyElement extends LitElement {
   @property()
@@ -8,8 +8,12 @@ export class MyElement extends LitElement {
 
   render() {
     return html`
-      <p>Welcome to the Lit tutorial!</p>
-      <p>This is the ${this.version} code.</p>
+     <dashboard-layout-layout variant="sidebar" with-container>
+  <nav slot="sidebar">Navigation content</nav>
+  <header slot="header">Page header</header>
+  <main slot="main">Main content</main>
+  <footer slot="footer">Footer content</footer>
+</dashboard-layout-layout>
     `;
   }
 }

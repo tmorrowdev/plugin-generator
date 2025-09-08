@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/schema",
+  "$id": "Cre8ComponentPattern",
+  "title": "Cre8 Component Pattern Generator",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the pattern",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": "What name would you like to use for the pattern?"
+    },
+    "pattern": {
+      "type": "string",
+      "description": "Pattern type to generate",
+      "enum": ["layout", "navigation", "form", "data-display", "feedback", "interaction"],
+      "default": "layout",
+      "x-prompt": {
+        "message": "What type of pattern would you like to create?",
+        "type": "list",
+        "items": [
+          { "value": "layout", "label": "Layout Pattern (grid, card, container)" },
+          { "value": "navigation", "label": "Navigation Pattern (nav, breadcrumbs, tabs)" },
+          { "value": "form", "label": "Form Pattern (form fields, buttons)" },
+          { "value": "data-display", "label": "Data Display Pattern (table, list, chart)" },
+          { "value": "feedback", "label": "Feedback Pattern (alert, modal, tooltip)" },
+          { "value": "interaction", "label": "Interaction Pattern (dropdown, accordion, tabs)" }
+        ]
+      }
+    },
+    "directory": {
+      "type": "string",
+      "description": "A directory where the pattern will be generated",
+      "default": "src/patterns"
+    },
+    "includeTests": {
+      "type": "boolean",
+      "description": "Include test files",
+      "default": true
+    },
+    "includeStorybook": {
+      "type": "boolean", 
+      "description": "Include Storybook stories",
+      "default": true
+    }
+  },
+  "required": ["name", "pattern"]
+}
