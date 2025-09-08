@@ -1,0 +1,154 @@
+import { html, LitElement, css } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
+import { 
+  Cre8Alert,
+  Cre8Modal,
+  Cre8Tooltip,
+  Cre8LoadingSpinner,
+  Cre8Button
+} from '@cre8_dev/cre8-wc';
+
+/**
+ * <%= className %> Feedback Pattern
+ * A reusable feedback pattern using Cre8-Components
+ */
+@customElement('<%= name %>-feedback')
+export class <%= className %>Feedback extends LitElement {
+  @property({ type: String }) variant: 'alert' | 'modal' | 'tooltip' | 'loading' = 'alert';
+  @property({ type: String }) type: 'success' | 'warning' | 'danger' | 'info' = 'info';
+  @property({ type: String }) message = '';
+  @property({ type: String }) title = '';
+  @property({ type: Boolean }) dismissible = true;
+  @property({ type: Boolean }) open = false;
+  @state() private isVisible = true;
+
+  static styles = css`
+    :host {
+      display: block;
+    }
+    
+    .feedback-wrapper {
+      width: 100%;
+    }
+    
+    .tooltip-trigger {
+      display: inline-block;
+      cursor: pointer;
+    }
+    
+    .loading-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+    }
+    
+    .loading-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+  `;
+
+  render() {
+    if (!this.isVisible && this.variant === 'alert') {
+      return html``;
+    }
+
+    if (this.variant === 'modal') {
+      return html`
+        <div class="feedback-wrapper">
+          <cre8-modal 
+            ?open="${this.open}"
+            @modal-close="${this.handleClose}"
+          >
+            <div slot="header">${this.title || 'Modal'}</div>
+            <div slot="body">
+              ${this.message ? html`<p>${this.message}</p>` : html`<slot></slot>`}
+            </div>
+            <div slot="footer">
+              <cre8-button @click="${this.handleClose}">
+                Close
+              </cre8-button>
+            </div>
+          </cre8-modal>
+        </div>
+      `;
+    }
+
+    if (this.variant === 'tooltip') {
+      return html`
+        <div class="feedback-wrapper">
+          <cre8-tooltip content="${this.message}">
+            <div class="tooltip-trigger">
+              <slot name="trigger">
+                <span>Hover for tooltip</span>
+              </slot>
+            </div>
+          </cre8-tooltip>
+        </div>
+      `;
+    }
+
+    if (this.variant === 'loading') {
+      return html`
+        <div class="feedback-wrapper">
+          <div class="loading-container">
+            <div class="loading-content">
+              <cre8-loading-spinner></cre8-loading-spinner>
+              ${this.message ? html`<p>${this.message}</p>` : html`<p>Loading...</p>`}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Default alert
+    return html`
+      <div class="feedback-wrapper">
+        <cre8-alert 
+          variant="${this.type}"
+          ?dismissible="${this.dismissible}"
+          @alert-dismiss="${this.handleDismiss}"
+        >
+          ${this.title ? html`<strong>${this.title}</strong><br>` : ''}
+          ${this.message || html`<slot></slot>`}
+        </cre8-alert>
+      </div>
+    `;
+  }
+
+  private handleDismiss() {
+    this.isVisible = false;
+    this.dispatchEvent(new CustomEvent('feedback-dismiss', {
+      detail: { variant: this.variant, type: this.type },
+      bubbles: true
+    }));
+  }
+
+  private handleClose() {
+    this.open = false;
+    this.dispatchEvent(new CustomEvent('feedback-close', {
+      detail: { variant: this.variant },
+      bubbles: true
+    }));
+  }
+
+  show() {
+    this.isVisible = true;
+    this.open = true;
+  }
+
+  hide() {
+    this.isVisible = false;
+    this.open = false;
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    '<%= name %>-feedback': <%= className %>Feedback;
+  }
+}

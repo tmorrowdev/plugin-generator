@@ -1,0 +1,192 @@
+import { html, LitElement, css } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
+import { 
+  Cre8Field,
+  Cre8Button,
+  Cre8ButtonGroup,
+  Cre8CheckboxField,
+  Cre8RadioField,
+  Cre8Select,
+  Cre8Alert
+} from '@cre8_dev/cre8-wc';
+
+/**
+ * <%= className %> Form Pattern
+ * A reusable form pattern using Cre8-Components
+ */
+@customElement('<%= name %>-form')
+export class <%= className %>Form extends LitElement {
+  @property({ type: String }) title = 'Form';
+  @property({ type: Boolean }) showValidation = true;
+  @state() private formData: Record<string, any> = {};
+  @state() private errors: Record<string, string> = {};
+
+  static styles = css`
+    :host {
+      display: block;
+    }
+    
+    .form-wrapper {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .form-section {
+      margin-bottom: 2rem;
+    }
+    
+    .form-actions {
+      margin-top: 2rem;
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+    }
+  `;
+
+  render() {
+    return html`
+      <div class="form-wrapper">
+        <form @submit="${this.handleSubmit}">
+          <div class="form-section">
+            <h2>${this.title}</h2>
+            
+            ${Object.keys(this.errors).length > 0 ? html`
+              <cre8-alert variant="danger">
+                Please correct the errors below:
+                <ul>
+                  ${Object.values(this.errors).map(error => html`<li>${error}</li>`)}
+                </ul>
+              </cre8-alert>
+            ` : ''}
+          </div>
+          
+          <div class="form-section">
+            <cre8-field 
+              label="Full Name" 
+              required
+              .error="${this.errors.name}"
+            >
+              <input 
+                type="text" 
+                name="name"
+                @input="${this.handleInput}"
+                .value="${this.formData.name || ''}"
+              />
+            </cre8-field>
+          </div>
+          
+          <div class="form-section">
+            <cre8-field 
+              label="Email" 
+              required
+              .error="${this.errors.email}"
+            >
+              <input 
+                type="email" 
+                name="email"
+                @input="${this.handleInput}"
+                .value="${this.formData.email || ''}"
+              />
+            </cre8-field>
+          </div>
+          
+          <div class="form-section">
+            <cre8-select 
+              label="Department"
+              name="department"
+              @change="${this.handleInput}"
+            >
+              <option value="">Select Department</option>
+              <option value="engineering">Engineering</option>
+              <option value="design">Design</option>
+              <option value="product">Product</option>
+            </cre8-select>
+          </div>
+          
+          <div class="form-section">
+            <cre8-checkbox-field 
+              name="subscribe"
+              @change="${this.handleInput}"
+            >
+              Subscribe to newsletter
+            </cre8-checkbox-field>
+          </div>
+          
+          <div class="form-actions">
+            <cre8-button-group>
+              <cre8-button type="button" variant="secondary" @click="${this.handleReset}">
+                Reset
+              </cre8-button>
+              <cre8-button type="submit" variant="primary">
+                Submit
+              </cre8-button>
+            </cre8-button-group>
+          </div>
+        </form>
+      </div>
+    `;
+  }
+
+  private handleInput(e: Event) {
+    const target = e.target as HTMLInputElement;
+    const { name, value, type, checked } = target;
+    
+    this.formData = {
+      ...this.formData,
+      [name]: type === 'checkbox' ? checked : value
+    };
+
+    // Clear error when user starts typing
+    if (this.errors[name]) {
+      const newErrors = { ...this.errors };
+      delete newErrors[name];
+      this.errors = newErrors;
+    }
+  }
+
+  private handleSubmit(e: Event) {
+    e.preventDefault();
+    
+    if (this.showValidation && !this.validate()) {
+      return;
+    }
+
+    this.dispatchEvent(new CustomEvent('form-submit', {
+      detail: { data: this.formData },
+      bubbles: true
+    }));
+  }
+
+  private handleReset() {
+    this.formData = {};
+    this.errors = {};
+    this.requestUpdate();
+  }
+
+  private validate(): boolean {
+    const errors: Record<string, string> = {};
+    
+    if (!this.formData.name?.trim()) {
+      errors.name = 'Name is required';
+    }
+    
+    if (!this.formData.email?.trim()) {
+      errors.email = 'Email is required';
+    } else if (!this.isValidEmail(this.formData.email)) {
+      errors.email = 'Please enter a valid email';
+    }
+    
+    this.errors = errors;
+    return Object.keys(errors).length === 0;
+  }
+
+  private isValidEmail(email: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    '<%= name %>-form': <%= className %>Form;
+  }
+}

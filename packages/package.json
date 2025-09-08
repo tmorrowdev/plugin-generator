@@ -1,5 +1,5 @@
 {
-  "name": "@leaf/yarn-plugin",
+  "name": "@cre8_dev/yarn-plugin",
   "version": "0.0.1",
   "dependencies": {
     "@nx/devkit": "19.6.2",

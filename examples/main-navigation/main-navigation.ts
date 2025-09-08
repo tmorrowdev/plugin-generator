@@ -1,0 +1,116 @@
+import { html, LitElement, css } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
+import {
+  Cre8PrimaryNav,
+  Cre8PrimaryNavItem,
+  Cre8Breadcrumbs,
+  Cre8BreadcrumbsItem,
+  Cre8Tabs,
+  Cre8Tab,
+  Cre8TabPanel,
+} from '@cre8_dev/cre8-wc';
+
+/**
+ * MainNavigation Navigation Pattern
+ * A reusable navigation pattern using Cre8-Components
+ */
+@customElement('main-navigation-navigation')
+export class MainNavigationNavigation extends LitElement {
+  @property({ type: String }) variant: 'primary' | 'breadcrumbs' | 'tabs' =
+    'primary';
+  @property({ type: Array }) items: Array<{
+    label: string;
+    href?: string;
+    active?: boolean;
+  }> = [];
+
+  static styles = css`
+    :host {
+      display: block;
+    }
+
+    .nav-wrapper {
+      width: 100%;
+    }
+  `;
+
+  render() {
+    if (this.variant === 'breadcrumbs') {
+      return html`
+        <div class="nav-wrapper">
+          <cre8-breadcrumbs>
+            ${this.items.map(
+              (item, index) => html`
+                <cre8-breadcrumbs-item
+                  href="${item.href || '#'}"
+                  ?current="${index === this.items.length - 1}"
+                >
+                  ${item.label}
+                </cre8-breadcrumbs-item>
+              `
+            )}
+          </cre8-breadcrumbs>
+        </div>
+      `;
+    }
+
+    if (this.variant === 'tabs') {
+      return html`
+        <div class="nav-wrapper">
+          <cre8-tabs>
+            ${this.items.map(
+              (item, index) => html`
+                <cre8-tab
+                  slot="tab"
+                  ?selected="${item.active}"
+                  @click="${() => this.handleTabClick(index)}"
+                >
+                  ${item.label}
+                </cre8-tab>
+              `
+            )}
+            ${this.items.map(
+              (item, index) => html`
+                <cre8-tab-panel slot="panel" ?selected="${item.active}">
+                  <slot name="panel-${index}"></slot>
+                </cre8-tab-panel>
+              `
+            )}
+          </cre8-tabs>
+        </div>
+      `;
+    }
+
+    // Default primary navigation
+    return html`
+      <div class="nav-wrapper">
+        <cre8-primary-nav>
+          ${this.items.map(
+            (item) => html`
+              <cre8-primary-nav-item
+                href="${item.href || '#'}"
+                ?active="${item.active}"
+              >
+                ${item.label}
+              </cre8-primary-nav-item>
+            `
+          )}
+        </cre8-primary-nav>
+      </div>
+    `;
+  }
+
+  private handleTabClick(index: number) {
+    this.items = this.items.map((item, i) => ({
+      ...item,
+      active: i === index,
+    }));
+    this.requestUpdate();
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'main-navigation-navigation': MainNavigationNavigation;
+  }
+}

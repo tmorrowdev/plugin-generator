@@ -15,8 +15,9 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@leaf/pattern-generator": ["generators/src/index.ts"],
-      "@leaf/yarn-plugin": ["packages/src/index.ts"]
+      "@cre8_dev/examples": ["examples/src/index.ts"],
+      "@cre8_dev/pattern-generator": ["generators/src/index.ts"],
+      "@cre8_dev/yarn-plugin": ["packages/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
